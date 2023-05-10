@@ -6,7 +6,7 @@ from rest_framework.permissions import (IsAuthenticatedOrReadOnly,
 from rest_framework import filters
 from rest_framework.pagination import (LimitOffsetPagination,
                                        PageNumberPagination)
-from django.http import FileResponse
+from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
 from django.db.models import Sum
@@ -15,7 +15,6 @@ from recipes.models import (Ingredient, Tag, Recipe, Favorites,
 from api.serializers import (IngredientSerializer, TagSerializer,
                              RecipeSerializer, RecipeReadSerializer)
 from api.filters import RecipesFilters
-from foodgram.settings import LIST_DIR
 
 
 class IngredientViewSet(viewsets.ModelViewSet):
@@ -49,17 +48,17 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return RecipeReadSerializer
         return RecipeSerializer
 
-    @action(methods=['post', 'delete'],
+    @action(methods=('post', 'delete'),
             detail=True,
-            permission_classes=[IsAuthenticated])
+            permission_classes=(IsAuthenticated))
     def favorite(self, request):
         if request.method == 'POST':
             return self.create_obj(Favorites, request.user, pk)
         return self.delete_obj(Favorites, request.user, pk)
 
-    @action(methods=['get', 'post', 'delete'],
+    @action(methods=('get', 'post', 'delete'),
             detail=True,
-            permission_classes=[IsAuthenticated],
+            permission_classes=(IsAuthenticated),
             url_path='shopping_cart')
     def shopping_cart(self, request):
         if request.method == 'POST':
@@ -101,9 +100,5 @@ class RecipeViewSet(viewsets.ModelViewSet):
             'ingredient__name',
             'ingredient__measurement_unit'
         ).annotate(amount=Sum('amount'))
-        with open(LIST_DIR, 'list.txt', 'a+') as list:
-            list.write('check_list')
-        filename = ({self.request.user.username}, 'list.xlsx')
-        response = FileResponse(open(LIST_DIR + '/list.txt', 'rb'))
-        response['Content-Disposition'] = f'attachment; filename={filename}'
+        response = HttpResponse.write(check_list)
         return response

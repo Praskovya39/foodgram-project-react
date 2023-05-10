@@ -1,7 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator
-from django.db.models import UniqueConstraint
 from users.models import User
+from foodgram.settings import MIN_VALUE
 
 
 class Ingredient(models.Model):
@@ -76,11 +76,16 @@ class Recipe(models.Model):
         verbose_name='Описание',
         help_text='Краткое описание рецепта'
     )
-    coking_time = models.DurationField(
+    coking_time = models.PositiveSmallIntegerField(
         blank=False,
         verbose_name='Время приготовления',
-        help_text='Указать время приготовления'
-    )
+        help_text='Указать время приготовления',
+        validators=(
+            MinValueValidator(
+                MIN_VALUE,
+                message=(f'Время готовки не может быть менее {MIN_VALUE} мин')
+            ),
+        ),)
     ingredient = models.ManyToManyField(
         Ingredient,
         through='IngredientsInRecipe',
@@ -123,13 +128,14 @@ class IngredientsInRecipe(models.Model):
         on_delete=models.CASCADE,
         related_name='recipe_ingredients'
     )
-    amount = models.IntegerField(
+    amount = models.PositiveSmallIntegerField(
         blank=False,
         verbose_name='Количество',
         help_text='Указать количество',
         validators=(
             MinValueValidator(
-                1, message='Минимальное количество ингридиентов 1'
+                MIN_VALUE,
+                message=f'Минимальное количество ингридиентов {MIN_VALUE}'
             ),
         ),
     )
@@ -139,7 +145,7 @@ class IngredientsInRecipe(models.Model):
         verbose_name_plural = 'Ингредиенты в рецепте'
         constraints = [
             models.UniqueConstraint(
-                fields=['recipe', 'ingredient'],
+                fields=('recipe', 'ingredient'),
                 name='unique_recipe'
             )
         ]
@@ -190,8 +196,9 @@ class ShoppingCart(models.Model):
         verbose_name = 'Корзина покупки'
         verbose_name_plural = 'Корзина покупок'
         constraints = [
-            UniqueConstraint(fields=['user', 'recipe'],
-                             name='unique_cart')
+            models.UniqueConstraint(
+                fields=('user', 'recipe'),
+                name='unique_cart')
         ]
 
     def __str__(self):

@@ -1,8 +1,11 @@
 import base64
 import webcolors
+from django.db import transaction
 from django.core.files.base import ContentFile
 from rest_framework import serializers
-from recipes.models import Ingredient, Tag, Recipe, Favorites, IngredientsInRecipe, ShoppingCart
+from recipes.models import (Ingredient, Tag, Recipe, Favorites,
+                            IngredientsInRecipe, ShoppingCart)
+from foodgram.settings import MIN_VALUE
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -12,19 +15,28 @@ class IngredientSerializer(serializers.ModelSerializer):
         lookup_field = 'name'
 
 
+class Error(Exception):
+    EMPTY_NAME = 'Для этого цвета нет имени'
+    NO_INGREDIENT = 'В рецепте должно быть не менее одного ингридидента'
+    NO_TIME = 'Время приготовления не может быть менее 1 минуты'
+    NO_COPY = 'Ингридиенты в рецепте не могут дублироваться'
+
+
 class Hex2NameColor(serializers.Field):
     def to_representation(self, value):
         return value
+
     def to_internal_value(self, data):
         try:
             data = webcolors.hex_to_name(data)
         except ValueError:
-            raise serializers.ValidationError('Для этого цвета нет имени')
+            raise Error.EMPTY_NAME
         return data
 
 
 class TagSerializer(serializers.ModelSerializer):
     color = Hex2NameColor()
+
     class Meta:
         model = Tag
         fields = ('name', 'color', 'slug')
@@ -62,10 +74,9 @@ class IngredientsInRecipeSerializer(serializers.ModelSerializer):
 
 
 class IngredientsInRecipeReadSerializer(serializers.ModelSerializer):
-    id = serializers.ReadOnlyField(source="ingredient.id")
-    name = serializers.ReadOnlyField(source="ingredient.name")
+    name = serializers.ReadOnlyField(source='ingredient.name')
     measurement_unit = serializers.ReadOnlyField(
-        source="ingredient.measurement_unit")
+        source='ingredient.measurement_unit')
 
     class Meta:
         model = IngredientsInRecipe
@@ -75,8 +86,12 @@ class IngredientsInRecipeReadSerializer(serializers.ModelSerializer):
 class RecipeReadSerializer(serializers.ModelSerializer):
     ingredient = IngredientsInRecipeReadSerializer(many=True)
     tags = TagSerializer(many=True)
-    is_favorited = serializers.SerializerMethodField(read_only=True)
-    is_in_shopping_cart = serializers.SerializerMethodField(read_only=True)
+    is_favorited = serializers.SerializerMethodField(
+        read_only=True,
+        method_name='is_in_favorities')
+    is_in_shopping_cart = serializers.SerializerMethodField(
+        read_only=True,
+        method_name='is_in_cart')
 
     class Meta:
         model = Recipe
@@ -84,12 +99,12 @@ class RecipeReadSerializer(serializers.ModelSerializer):
                   'ingridient', 'tags', 'author',
                   'is_favorited', 'is_favorited',)
 
-    def is_favorited(self, obj):
+    def is_in_favorities(self, obj):
         request = self.context.get('request')
         return Favorites.objects.filter(
             user=request.user, recipe__id=obj.id).exists()
 
-    def is_in_shopping_cart(self, obj):
+    def is_in_cart(self, obj):
         request = self.context.get('request')
         return ShoppingCart.objects.filter(
             user=request.user, recipe__id=obj.id).exists()
@@ -108,9 +123,10 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Recipe
-        fields = ('name', 'image', 'text', 'coking_time', 'ingredient', 'tags', 'author',)
+        fields = ('name', 'image', 'text',
+                  'coking_time', 'ingredient', 'tags', 'author',)
 
-
+    @transaction.atomic
     def create(self, validated_data):
         ingredients = validated_data.pop('ingredient')
         tags = validated_data.pop('tags')
@@ -119,19 +135,41 @@ class RecipeSerializer(serializers.ModelSerializer):
             currets_tag, status = Tag.objects.get_or_create(**tag)
             TagRecipe.objects.create(tags=currets_tag, recipe=recipe)
         for ingredient in ingredients:
-            currets_ingredient, status = Ingredient.objects.get_or_create(**ingredient)
-            IngredientsInRecipe.objects.create(ingredient=currets_ingredient, recipe=recipe)
+            currets_ingredient, status = (
+                Ingredient.objects.get_or_create(**ingredient)
+                )
+            IngredientsInRecipe.objects.create(
+                ingredient=currets_ingredient, recipe=recipe
+                )
         return recipe
 
+    @transaction.atomic
     def update(self, instance, validated_data):
         instance.name = validated_data.get('name', instance.name)
         instance.image = validated_data.get('image', instance.image)
         instance.text = validated_data.get('text', instance.text)
-        instance.coking_time = validated_data.get('coking_time', instance.coking_time)
-        instance.ingredient = validated_data.get('ingredient', instance.ingredient)
+        instance.coking_time = validated_data.get(
+            'coking_time', instance.coking_time
+            )
+        instance.ingredient = validated_data.get(
+            'ingredient', instance.ingredient
+            )
         instance.tags = validated_data.get('tags', instance.tags)
         instance.save()
         return instance
+
+    def validate_ingredients(self, value):
+        ingredients = value.get('ingredient')
+        if not ingredients:
+            raise Error.NO_INGREDIENT
+        if len(ingredients) > len(ingredients.id):
+            raise Error.NO_COPY
+        return value
+
+    def validate_cooking_time(self, cooking_time):
+        if cooking_time < MIN_VALUE:
+            raise Error.NO_TIME
+        return cooking_time
 
 
 class ShoppingCartSerializer(serializers.ModelSerializer):

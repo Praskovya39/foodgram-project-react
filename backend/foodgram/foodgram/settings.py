@@ -1,23 +1,13 @@
 import os
 from datetime import timedelta
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'h^v&!p1ll*3b$+hsdz)sp67%k7&-5w*&n1s168+*=igfx%n3h('
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = []
 
-
-# Application definition
+SECRET_KEY = os.getenv('SECRET_KEY', default='12345')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -70,8 +60,12 @@ WSGI_APPLICATION = 'foodgram.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': os.getenv('DB_ENGINE', default='django.db.backends.postgresql'),
+        'NAME': os.getenv('DB_NAME', default='default'),
+        'USER': os.getenv('POSTGRES_USER', default='default'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', default='default'),
+        'HOST': os.getenv('DB_HOST', default='default'),
+        'PORT': os.getenv('DB_PORT', default='1234')
     }
 }
 
@@ -138,3 +132,5 @@ EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
 
 LIST_DIR = BASE_DIR, 'data'
+
+MIN_VALUE = 1
