@@ -39,6 +39,8 @@ class User(AbstractUser):
         return self.username
 
     class Meta:
+        verbose_name = 'Данные юзера'
+        verbose_name_plural = 'Данные юзеров'
         constraints = (
             models.UniqueConstraint(fields=('email', 'username'),
                                     name='unique_user'),
@@ -60,6 +62,8 @@ class Subscription(models.Model):
         help_text='На кого подписываются')
 
     class Meta:
+        verbose_name = 'Подписка'
+        verbose_name_plural = 'Подписки'
         constraints = (
             models.UniqueConstraint(
                 fields=('author', 'follower'), name='unique_follower'

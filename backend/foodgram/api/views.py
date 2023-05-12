@@ -15,6 +15,7 @@ from recipes.models import (Ingredient, Tag, Recipe, Favorites,
 from api.serializers import (IngredientSerializer, TagSerializer,
                              RecipeSerializer, RecipeReadSerializer)
 from api.filters import RecipesFilters
+from api.errors import Error, SuccessMessage
 
 
 class IngredientViewSet(viewsets.ModelViewSet):
@@ -69,14 +70,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     def create_obj(self, model, user, pk):
         if model.object.filter(user=user, recipe_id=pk).exists:
-            return Response(
-                {'message': 'Рецепт уже был добавлен'},
-                status=status.HTTP_400_BAD_REQUEST
-                )
+            raise Error.DOUBLE
         recipe = get_object_or_404(Recipe, id=pk)
         model.object.create(user=user, recipe=recipe)
-        return Response(
-            {'message': 'Рецепт добавлен'},
+        return Response(SuccessMessage.RECIPE_HAS_ADDED,
             status=status.HTTP_201_CREATED
             )
 
@@ -84,14 +81,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
         obj = model.object.filter(user=user, recipe_id=pk)
         if obj.exists:
             obj.delete()
-            return Response(
-                {'message': 'Рецепт удален'},
+            return Response(SuccessMessage.RECIPE_DELETE,
                 status=status.HTTP_200_OK
             )
-        return Response(
-            {'message': 'Такой рецепт ранее не был добавлен'},
-            status=status.HTTP_400_BAD_REQUEST
-            )
+        raise Error.NO_RECIPE
 
     def download_shopping_cart(self, model):
         check_list = IngredientsInRecipe.objects.filter(

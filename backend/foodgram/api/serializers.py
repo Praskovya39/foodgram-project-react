@@ -5,7 +5,8 @@ from django.core.files.base import ContentFile
 from rest_framework import serializers
 from recipes.models import (Ingredient, Tag, Recipe, Favorites,
                             IngredientsInRecipe, ShoppingCart)
-from foodgram.settings import MIN_VALUE
+from foodgram.settings import MIN_VALUE_MINUTES, MIN_VALUE_AMOUNT, MIN_VALUE_INGREDIENTS
+from api.errors import Error
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -81,6 +82,11 @@ class IngredientsInRecipeReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = IngredientsInRecipe
         fields = ('id', 'name', 'measurement_unit', 'amount')
+
+    def validate_amount(self, amount):
+        if amount < MIN_VALUE_AMOUNT:
+            raise Error.NO_AMOUNT
+        return amount
 
 
 class RecipeReadSerializer(serializers.ModelSerializer):
@@ -160,14 +166,14 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def validate_ingredients(self, value):
         ingredients = value.get('ingredient')
-        if not ingredients:
+        if len(ingredients) < MIN_VALUE_INGREDIENTS:
             raise Error.NO_INGREDIENT
         if len(ingredients) > len(ingredients.id):
             raise Error.NO_COPY
         return value
 
     def validate_cooking_time(self, cooking_time):
-        if cooking_time < MIN_VALUE:
+        if cooking_time < MIN_VALUE_MINUTES:
             raise Error.NO_TIME
         return cooking_time
 

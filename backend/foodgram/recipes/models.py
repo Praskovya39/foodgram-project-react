@@ -1,7 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator
 from users.models import User
-from foodgram.settings import MIN_VALUE
+from foodgram.settings import MIN_VALUE_MINUTES, MIN_VALUE_AMOUNT
 
 
 class Ingredient(models.Model):
@@ -82,8 +82,8 @@ class Recipe(models.Model):
         help_text='Указать время приготовления',
         validators=(
             MinValueValidator(
-                MIN_VALUE,
-                message=(f'Время готовки не может быть менее {MIN_VALUE} мин')
+                MIN_VALUE_MINUTES,
+                message=(f'Время готовки не может быть менее {MIN_VALUE_MINUTES} мин')
             ),
         ),)
     ingredient = models.ManyToManyField(
@@ -134,21 +134,21 @@ class IngredientsInRecipe(models.Model):
         help_text='Указать количество',
         validators=(
             MinValueValidator(
-                MIN_VALUE,
-                message=f'Минимальное количество ингридиентов {MIN_VALUE}'
+                MIN_VALUE_AMOUNT,
+                message=f'Минимальное количество ингридиентов {MIN_VALUE_AMOUNT}',
             ),
         ),
     )
 
     class Meta:
-        verbose_name = 'Ингредиент в рецепте'
-        verbose_name_plural = 'Ингредиенты в рецепте'
-        constraints = [
+        verbose_name = 'Ингредиент в рецепте',
+        verbose_name_plural = 'Ингредиенты в рецепте',
+        constraints = (
             models.UniqueConstraint(
                 fields=('recipe', 'ingredient'),
                 name='unique_recipe'
-            )
-        ]
+            ),
+        )
 
 
 class Favorites(models.Model):
@@ -166,8 +166,8 @@ class Favorites(models.Model):
         help_text='Понравившийся рецепт')
 
     class Meta:
-        verbose_name = 'Избранное'
-        verbose_name_plural = 'Избранное'
+        verbose_name = 'Избранное',
+        verbose_name_plural = 'Избранное',
         constraints = (
             models.UniqueConstraint(
                 fields=('recipe', 'user'), name='unique_favorites'
@@ -193,13 +193,13 @@ class ShoppingCart(models.Model):
         help_text='Рецепт, из которого берутся ингридиенты')
 
     class Meta:
-        verbose_name = 'Корзина покупки'
-        verbose_name_plural = 'Корзина покупок'
-        constraints = [
+        verbose_name = 'Корзина покупки',
+        verbose_name_plural = 'Корзина покупок',
+        constraints = (
             models.UniqueConstraint(
                 fields=('user', 'recipe'),
-                name='unique_cart')
-        ]
+                name='unique_cart'),
+        )
 
     def __str__(self):
         return f'{self.user} добавил "{self.recipe}" в Корзину покупок'
