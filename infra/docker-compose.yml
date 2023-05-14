@@ -9,7 +9,7 @@ services:
       - ./.env
   backend:
     restart: always  
-    image: prasko39/foodgram-backend:latest
+    image: prasko39/foodgram_backend:latest
     volumes:
       - static_value:/app/static/
       - media_value:/app/media/
@@ -18,7 +18,7 @@ services:
     env_file:
       - ./.env
   frontend:
-    image: prasko39/foodgram-frontend:latest
+    image: prasko39/foodgram_frontend:latest
     restart: always
     volumes:
       - ../frontend/:/app/result_build/
