@@ -83,7 +83,7 @@ class Recipe(models.Model):
         validators=(
             MinValueValidator(
                 MIN_VALUE_MINUTES,
-                message=(f'Время готовки не может быть менее {MIN_VALUE_MINUTES} мин')
+                message=(f'Время менее {MIN_VALUE_MINUTES} мин')
             ),
         ),)
     ingredient = models.ManyToManyField(
@@ -96,6 +96,7 @@ class Recipe(models.Model):
     )
     tags = models.ManyToManyField(
         Tag,
+        through='TagRecipe',
         blank=False,
         related_name='recipes',
         verbose_name='Тег',
@@ -117,6 +118,28 @@ class Recipe(models.Model):
         return self.name
 
 
+class TagRecipe(models.Model):
+    tag = models.ForeignKey(
+        Tag,
+        on_delete=models.CASCADE,
+        related_name='tags',
+        verbose_name='Тэг'
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='tags_in_recipe',
+        verbose_name='Рецепт',
+    )
+
+    def __str__(self):
+        return f'{self.tag} рецепта {self.recipe}'
+
+    class Meta:
+        verbose_name = 'Тэг в рецепте'
+        verbose_name_plural = 'Тэги в рецепте'
+
+
 class IngredientsInRecipe(models.Model):
     ingredient = models.ForeignKey(
         Ingredient,
@@ -135,7 +158,7 @@ class IngredientsInRecipe(models.Model):
         validators=(
             MinValueValidator(
                 MIN_VALUE_AMOUNT,
-                message=f'Минимальное количество ингридиентов {MIN_VALUE_AMOUNT}',
+                message=f'Ингридиентов не менее {MIN_VALUE_AMOUNT}',
             ),
         ),
     )

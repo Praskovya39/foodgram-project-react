@@ -1,11 +1,16 @@
 import base64
 import webcolors
+
 from django.db import transaction
 from django.core.files.base import ContentFile
 from rest_framework import serializers
-from recipes.models import (Ingredient, Tag, Recipe, Favorites,
-                            IngredientsInRecipe, ShoppingCart)
-from foodgram.settings import MIN_VALUE_MINUTES, MIN_VALUE_AMOUNT, MIN_VALUE_INGREDIENTS
+from recipes.models import (Ingredient, Tag,
+                            Recipe, Favorites,
+                            IngredientsInRecipe,
+                            ShoppingCart, TagRecipe)
+from foodgram.settings import (MIN_VALUE_MINUTES,
+                               MIN_VALUE_AMOUNT,
+                               MIN_VALUE_INGREDIENTS)
 from api.errors import Error
 
 
@@ -142,11 +147,9 @@ class RecipeSerializer(serializers.ModelSerializer):
             TagRecipe.objects.create(tags=currets_tag, recipe=recipe)
         for ingredient in ingredients:
             currets_ingredient, status = (
-                Ingredient.objects.get_or_create(**ingredient)
-                )
+                Ingredient.objects.get_or_create(**ingredient))
             IngredientsInRecipe.objects.create(
-                ingredient=currets_ingredient, recipe=recipe
-                )
+                ingredient=currets_ingredient, recipe=recipe)
         return recipe
 
     @transaction.atomic
@@ -155,11 +158,9 @@ class RecipeSerializer(serializers.ModelSerializer):
         instance.image = validated_data.get('image', instance.image)
         instance.text = validated_data.get('text', instance.text)
         instance.coking_time = validated_data.get(
-            'coking_time', instance.coking_time
-            )
+            'coking_time', instance.coking_time)
         instance.ingredient = validated_data.get(
-            'ingredient', instance.ingredient
-            )
+            'ingredient', instance.ingredient)
         instance.tags = validated_data.get('tags', instance.tags)
         instance.save()
         return instance

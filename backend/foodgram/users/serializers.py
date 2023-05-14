@@ -1,6 +1,5 @@
 from rest_framework import status, serializers
 from djoser.serializers import UserCreateSerializer, UserSerializer
-
 from recipes.models import Recipe
 from users.models import Subscription, User
 

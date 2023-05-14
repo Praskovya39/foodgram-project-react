@@ -22,9 +22,9 @@ class Command(BaseCommand):
                 data = json.load(f)
                 for ingredient in data:
                     try:
-                        Ingredient.objects.create(name=ingredient["name"],
-                                                   measurement_unit=ingredient[
-                                                   "measurement_unit"])
+                        Ingredient.objects.create(name=ingredient['name'],
+                                                  measurement_unit=ingredient[
+                                                  'measurement_unit'])
                     except IntegrityError:
                         print(f'Ингредиент {ingredient["name"]} '
                               f'{ingredient["measurement_unit"]} '
@@ -32,3 +32,4 @@ class Command(BaseCommand):
 
         except FileNotFoundError:
             raise CommandError('Файл отсутствует')
+        

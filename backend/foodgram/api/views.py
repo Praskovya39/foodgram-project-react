@@ -63,27 +63,25 @@ class RecipeViewSet(viewsets.ModelViewSet):
             url_path='shopping_cart')
     def shopping_cart(self, request):
         if request.method == 'POST':
-            return self.create_obj(ShoppingCart, request.user, pk)
-        elif request.method == 'GET':
+            return self.create_obj(ShoppingCart, request.user, id)
+        if request.method == 'GET':
             return self.download_shopping_cart(ShoppingCart, request.user)
-        return self.delete_obj(ShoppingCart, request.user, pk)
+        return self.delete_obj(ShoppingCart, request.user, id)
 
-    def create_obj(self, model, user, pk):
-        if model.object.filter(user=user, recipe_id=pk).exists:
+    def create_obj(self, model, user, id):
+        if model.object.filter(user=user, recipe_id=id).exists:
             raise Error.DOUBLE
-        recipe = get_object_or_404(Recipe, id=pk)
+        recipe = get_object_or_404(Recipe, id=id)
         model.object.create(user=user, recipe=recipe)
         return Response(SuccessMessage.RECIPE_HAS_ADDED,
-            status=status.HTTP_201_CREATED
-            )
+                        status=status.HTTP_201_CREATED)
 
-    def delete_obj(self, model, user, pk):
-        obj = model.object.filter(user=user, recipe_id=pk)
+    def delete_obj(self, model, user, id):
+        obj = model.object.filter(user=user, recipe_id=id)
         if obj.exists:
             obj.delete()
             return Response(SuccessMessage.RECIPE_DELETE,
-                status=status.HTTP_200_OK
-            )
+                            status=status.HTTP_200_OK)
         raise Error.NO_RECIPE
 
     def download_shopping_cart(self, model):
@@ -93,5 +91,4 @@ class RecipeViewSet(viewsets.ModelViewSet):
             'ingredient__name',
             'ingredient__measurement_unit'
         ).annotate(amount=Sum('amount'))
-        response = HttpResponse.write(check_list)
-        return response
+        return HttpResponse.write(check_list)
