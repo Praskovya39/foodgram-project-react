@@ -32,4 +32,3 @@ class Command(BaseCommand):
 
         except FileNotFoundError:
             raise CommandError('Файл отсутствует')
-        
