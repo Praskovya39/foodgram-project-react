@@ -7,9 +7,9 @@ services:
       - data_value:/var/lib/postgresql/data/
     env_file:
       - ./.env
-  web:
+  backend:
     restart: always  
-    image: prasko39/foodgram:latest
+    image: prasko39/foodgram-backend:latest
     volumes:
       - static_value:/app/static/
       - media_value:/app/media/
@@ -18,14 +18,12 @@ services:
     env_file:
       - ./.env
   frontend:
-    restart: always  
-    build:
-      context: ../frontend
-      dockerfile: Dockerfile
+    image: prasko39/foodgram-frontend:latest
+    restart: always
     volumes:
       - ../frontend/:/app/result_build/
     depends_on:
-      - web
+      - backend
   nginx:
     restart: always  
     image: nginx:1.19.3
