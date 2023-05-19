@@ -2,7 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
-class User(AbstractUser):
+class CustomUser(AbstractUser):
     username = models.CharField(
         'Логин',
         max_length=150,
@@ -34,6 +34,8 @@ class User(AbstractUser):
         verbose_name='Пароль',
         help_text='Укажите пароль',
     )
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username', 'first_name', 'last_name', 'password']
 
     def __str__(self):
         return self.username
@@ -49,13 +51,13 @@ class User(AbstractUser):
 
 class Subscription(models.Model):
     follower = models.ForeignKey(
-        User,
+        CustomUser,
         on_delete=models.CASCADE,
         related_name='follower',
         verbose_name='Подписчик',
         help_text='Тот, кто подписывается')
     author = models.ForeignKey(
-        User,
+        CustomUser,
         on_delete=models.CASCADE,
         related_name='following',
         verbose_name='Автор рецепта',

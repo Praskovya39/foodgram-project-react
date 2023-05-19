@@ -1,10 +1,13 @@
+from django.contrib.auth import get_user_model
 from rest_framework import status, serializers
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from recipes.models import Recipe
-from users.models import Subscription, User
+from users.models import Subscription, CustomUser
+
+User = get_user_model()
 
 
-class UserListSerializer(UserSerializer):
+class CustomUserListSerializer(UserSerializer):
     is_subscribed = serializers.SerializerMethodField()
 
     class Meta:
@@ -21,7 +24,7 @@ class UserListSerializer(UserSerializer):
         return user.subscriber.filter(author=obj).exists()
 
 
-class UserPostSerializer(UserCreateSerializer):
+class CustomUserPostSerializer(UserCreateSerializer):
 
     class Meta:
         model = User

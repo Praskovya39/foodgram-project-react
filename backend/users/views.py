@@ -5,21 +5,18 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 from djoser.views import UserViewSet
-from users.models import Subscription, User
+from users.models import Subscription, CustomUser
 from users.serializers import SubscribeSerializer
 
 
 class CustomUserViewSet(UserViewSet):
     pagination_class = PageNumberPagination
 
-    def get_queryset(self):
-        return User.objects.all()
-
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=[IsAuthenticated])
     def subscribe(self, request, **kwargs):
-        user = get_object_or_404(User, username=request.user)
-        author = get_object_or_404(User, id=self.kwargs.get('id'))
+        user = get_object_or_404(CustomUser, username=request.user)
+        author = get_object_or_404(CustomUser, id=self.kwargs.get('id'))
 
         if request.method == 'POST':
             serializer = SubscribeSerializer(
