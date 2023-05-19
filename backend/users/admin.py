@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
+
 class RecipeAdmin(admin.ModelAdmin):
 
     list_display = ('id', 'username', 'email', 'first_name',
