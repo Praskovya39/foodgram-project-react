@@ -23,7 +23,7 @@ class CustomUserListSerializer(UserSerializer):
 
 class CustomUserPostSerializer(UserCreateSerializer):
     model = CustomUser
-    
+
     class Meta:
         fields = ('email', 'username', 'first_name', 'last_name', 'password')
 
