@@ -6,7 +6,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 load_dotenv()
 
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
