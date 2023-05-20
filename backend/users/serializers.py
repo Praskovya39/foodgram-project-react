@@ -1,17 +1,14 @@
-from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
 from rest_framework import status, serializers
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from recipes.models import Recipe
-from users.models import Subscription
-
-User = get_user_model()
+from users.models import Subscription, CustomUser
 
 
 class CustomUserListSerializer(UserSerializer):
     is_subscribed = serializers.SerializerMethodField()
 
-    class Meta:
-        model = User
+    class Meta(UserCreateSerializer.Meta):
         fields = (
             'id', 'email', 'username', 'first_name',
             'last_name', 'is_subscribed',
@@ -25,9 +22,8 @@ class CustomUserListSerializer(UserSerializer):
 
 
 class CustomUserPostSerializer(UserCreateSerializer):
-
+    model = CustomUser
     class Meta:
-        model = User
         fields = ('email', 'username', 'first_name', 'last_name', 'password')
 
 
@@ -73,7 +69,9 @@ class SubscribeSerializer(serializers.ModelSerializer):
         return True
 
     def validate(self, data):
-        author = self.instance
+        author_id = self.context.get(
+            'request').parser_context.get('kwargs').get('id')
+        author = get_object_or_404(CustomUser, id=author_id)
         user = self.context.get('request').user
         if Subscription.objects.filter(author=author, user=user).exists():
             raise serializers.ValidationError(

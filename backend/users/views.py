@@ -12,6 +12,9 @@ from users.serializers import SubscribeSerializer
 class CustomUserViewSet(UserViewSet):
     pagination_class = PageNumberPagination
 
+    def get_queryset(self):
+        return CustomUser.objects.all()
+
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=[IsAuthenticated])
     def subscribe(self, request, **kwargs):
