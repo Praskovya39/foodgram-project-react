@@ -21,7 +21,7 @@ class CustomUserListSerializer(UserSerializer):
         user = self.context.get('request').user
         if user.is_anonymous:
             return False
-        return user.subscribtion.filter(author=obj).exists()
+        return Subscription.objects.filter(user=user, author=obj).exists()
 
 
 class CustomUserPostSerializer(UserCreateSerializer):
@@ -38,28 +38,28 @@ class RecipeProfileSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'image', 'cooking_time')
 
 
-class SubscribeSerializer(UserSerializer):
+class SubscribeSerializer(serializers.ModelSerializer):
+    email = serializers.ReadOnlyField(source='author.email')
+    id = serializers.ReadOnlyField(source='author.id')
+    username = serializers.ReadOnlyField(source='author.username')
+    first_name = serializers.ReadOnlyField(source='author.first_name')
+    last_name = serializers.ReadOnlyField(source='author.last_name')
     is_subscribed = serializers.SerializerMethodField()
     recipes = serializers.SerializerMethodField()
     recipes_count = serializers.SerializerMethodField()
 
-    class Meta(UserSerializer.Meta):
+    class Meta:
+        model = Subscription
         fields = (
             'id', 'email', 'username', 'first_name', 'last_name',
             'is_subscribed', 'recipes', 'recipes_count',
         )
         read_only_fields = ('email', 'username', 'first_name', 'last_name')
 
-    def get_is_subscribed(self, obj):
-        user = self.context.get('request').user
-        if user.is_anonymous:
-            return False
-        return user.subscriber.filter(author=obj).exists()
-
     def get_recipes(self, obj):
         request = self.context.get('request')
         recipes_limit = request.GET.get('recipes_limit')
-        recipes = obj.recipes.all()
+        recipes = Recipe.objects.filter(author=obj.author)
         if recipes_limit:
             recipes = recipes[: int(recipes_limit)]
         serializer = RecipeProfileSerializer(recipes,
@@ -67,7 +67,10 @@ class SubscribeSerializer(UserSerializer):
         return serializer.data
 
     def get_recipes_count(self, obj):
-        return obj.recipes.count()
+        return Recipe.objects.filter(author=obj.author).count()
+
+    def get_is_subscribed(self, obj):
+        return True
 
     def validate(self, data):
         author = self.instance
