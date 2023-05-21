@@ -50,7 +50,7 @@ class CustomUser(AbstractUser):
 
 
 class Subscription(models.Model):
-    follower = models.ForeignKey(
+    user = models.ForeignKey(
         CustomUser,
         on_delete=models.CASCADE,
         related_name='follower',
