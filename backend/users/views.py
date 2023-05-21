@@ -6,12 +6,12 @@ from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 from djoser.views import UserViewSet
 from users.models import Subscription, CustomUser
-from users.serializers import SubscribeSerializer, CustomUserSerializer
+from users.serializers import SubscribeSerializer, CustomUserListSerializer
 
 
 class CustomUserViewSet(UserViewSet):
     pagination_class = PageNumberPagination
-    serializer_class = CustomUserSerializer
+    serializer_class = CustomUserListSerializer
 
     def get_queryset(self):
         return CustomUser.objects.all()
