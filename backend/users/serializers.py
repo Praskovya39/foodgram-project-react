@@ -8,7 +8,8 @@ from users.models import Subscription, CustomUser
 class CustomUserListSerializer(UserSerializer):
     is_subscribed = serializers.SerializerMethodField()
 
-    class Meta(UserCreateSerializer.Meta):
+    class Meta:
+        model = CustomUser
         fields = (
             'id', 'email', 'username', 'first_name',
             'last_name', 'is_subscribed',
@@ -22,9 +23,9 @@ class CustomUserListSerializer(UserSerializer):
 
 
 class CustomUserPostSerializer(UserCreateSerializer):
-    model = CustomUser
 
     class Meta:
+        model = CustomUser
         fields = ('email', 'username', 'first_name', 'last_name', 'password')
 
 
