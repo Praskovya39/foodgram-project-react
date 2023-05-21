@@ -16,10 +16,10 @@ class CustomUserListSerializer(UserSerializer):
         )
 
     def get_is_subscribed(self, obj):
-        user = self.context.get('request').user
-        if user.is_anonymous:
+        request = self.context.get('request')
+        if request.user.is_anonymous:
             return False
-        return Subscription.objects.filter(user=user, author=obj).exists()
+        return Subscription.objects.filter(user=request.user).exists()
 
 
 class CustomUserPostSerializer(UserCreateSerializer):
@@ -57,7 +57,7 @@ class SubscribeSerializer(serializers.ModelSerializer):
     def get_recipes(self, obj):
         request = self.context.get('request')
         recipes_limit = request.GET.get('recipes_limit')
-        recipes = Recipe.objects.filter(author=obj.author)
+        recipes = obj.recipes.all()
         if recipes_limit:
             recipes = recipes[: int(recipes_limit)]
         serializer = RecipeProfileSerializer(recipes,
@@ -75,7 +75,7 @@ class SubscribeSerializer(serializers.ModelSerializer):
             'request').parser_context.get('kwargs').get('id')
         author = get_object_or_404(CustomUser, id=author_id)
         user = self.context.get('request').user
-        if Subscription.objects.filter(author=author, user=user).exists():
+        if Subscription.objects.filter(author=author_id).exists():
             raise serializers.ValidationError(
                 detail='Подписка уже существует',
                 code=status.HTTP_400_BAD_REQUEST,

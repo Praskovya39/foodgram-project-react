@@ -10,17 +10,15 @@ from users.serializers import SubscribeSerializer, CustomUserListSerializer
 
 
 class CustomUserViewSet(UserViewSet):
+    queryset = CustomUser.objects.all()
     pagination_class = PageNumberPagination
     serializer_class = CustomUserListSerializer
 
-    def get_queryset(self):
-        return CustomUser.objects.all()
-
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=[IsAuthenticated])
-    def subscribe(self, request, **kwargs):
-        user = get_object_or_404(CustomUser, username=request.user)
-        author = get_object_or_404(CustomUser, id=self.kwargs.get('id'))
+    def subscribe(self, request, id):
+        user = request.user
+        author = get_object_or_404(CustomUser, pk=id)
 
         if request.method == 'POST':
             serializer = SubscribeSerializer(
