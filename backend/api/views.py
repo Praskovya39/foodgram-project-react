@@ -7,20 +7,22 @@ from rest_framework import filters
 from rest_framework.pagination import (LimitOffsetPagination)
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Sum
 from recipes.models import (Ingredient, Tag, Recipe, Favorites,
                             ShoppingCart, IngredientsInRecipe)
 from api.serializers import (IngredientSerializer, TagSerializer,
                              RecipeSerializer, RecipeReadSerializer)
 from api.errors import Error, SuccessMessage
+from api.filters import RecipeFilter
+from api.pagination import Paginator
 
 
 class IngredientViewSet(viewsets.ModelViewSet):
     queryset = Ingredient.objects.all()
     permission_classes = (IsAuthenticatedOrReadOnly,)
-    pagination_class = LimitOffsetPagination
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('name',)
+    pagination_class = None
+    search_fields = ('^name',)
     serializer_class = IngredientSerializer
 
 
@@ -35,7 +37,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     permission_classes = (IsAuthenticatedOrReadOnly,)
     ordering = ('-id',)
-    pagination_class = None
+    pagination_class = Paginator
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = RecipeFilter
 
     def get_serializer_class(self):
         if self.action in ('list', 'retrieve'):

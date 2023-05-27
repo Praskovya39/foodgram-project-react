@@ -171,23 +171,6 @@ class RecipeSerializer(serializers.ModelSerializer):
             raise Error.NO_TIME
         return cooking_time
 
-    def create(self, validated_data):
-        request = self.context.get('request', None)
-        tags = validated_data.pop('tags')
-        ingredients = validated_data.pop('ingredients')
-        recipe = Recipe.objects.create(author=request.user, **validated_data)
-        recipe.tags.set(tags)
-        self.create_ingredients(recipe, ingredients)
-        return recipe
-
-    def update(self, instance, validated_data):
-        instance.tags.clear()
-        IngredientsInRecipe.objects.filter(recipe=instance).delete()
-        instance.tags.set(validated_data.pop('tags'))
-        ingredients = validated_data.pop('ingredients')
-        self.create_ingredients(instance, ingredients)
-        return super().update(instance, validated_data)
-
 
 class ShoppingCartSerializer(serializers.ModelSerializer):
     class Meta:

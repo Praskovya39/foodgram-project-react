@@ -3,7 +3,7 @@ from recipes.models import Recipe, Tag
 from users.models import CustomUser
 
 
-class RecipesFilters(FilterSet):
+class RecipeFilters(FilterSet):
     tags = filters.ModelMultipleChoiceFilter(
         field_name='tags__slug',
         queryset=Tag.objects.all(),
