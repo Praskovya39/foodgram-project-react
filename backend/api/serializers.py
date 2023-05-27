@@ -101,14 +101,14 @@ class RecipeReadSerializer(serializers.ModelSerializer):
         model = Recipe
         fields = ('name', 'image', 'text', 'coking_time',
                   'ingridient', 'tags', 'author',
-                  'is_favorited', 'is_favorited',)
+                  'is_in_shopping_cart', 'is_favorited',)
 
-    def is_in_favorities(self, obj):
+    def get_is_in_favorities(self, obj):
         request = self.context.get('request')
         return Favorites.objects.filter(
             user=request.user, recipe__id=obj.id).exists()
 
-    def is_in_cart(self, obj):
+    def get_is_in_shopping_cart(self, obj):
         request = self.context.get('request')
         return ShoppingCart.objects.filter(
             user=request.user, recipe__id=obj.id).exists()
