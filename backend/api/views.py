@@ -30,18 +30,12 @@ class IngredientViewSet(viewsets.ModelViewSet):
 class TagViewSet(viewsets.ModelViewSet):
     queryset = Tag.objects.all()
     permission_classes = (IsAuthenticatedOrReadOnly,)
-    pagination_class = LimitOffsetPagination
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('name',)
     serializer_class = TagSerializer
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     permission_classes = (IsAuthenticatedOrReadOnly,)
-    pagination_class = PageNumberPagination
-    filter_backends = (DjangoFilterBackend,)
-    filter_class = RecipesFilters
     ordering = ('-id',)
 
     def get_serializer_class(self):
