@@ -21,13 +21,6 @@ class IngredientSerializer(serializers.ModelSerializer):
         lookup_field = 'name'
 
 
-class Error(Exception):
-    EMPTY_NAME = 'Для этого цвета нет имени'
-    NO_INGREDIENT = 'В рецепте должно быть не менее одного ингридидента'
-    NO_TIME = 'Время приготовления не может быть менее 1 минуты'
-    NO_COPY = 'Ингридиенты в рецепте не могут дублироваться'
-
-
 class Hex2NameColor(serializers.Field):
     def to_representation(self, value):
         return value
@@ -177,6 +170,23 @@ class RecipeSerializer(serializers.ModelSerializer):
         if cooking_time < MIN_VALUE_MINUTES:
             raise Error.NO_TIME
         return cooking_time
+
+    def create(self, validated_data):
+        request = self.context.get('request', None)
+        tags = validated_data.pop('tags')
+        ingredients = validated_data.pop('ingredients')
+        recipe = Recipe.objects.create(author=request.user, **validated_data)
+        recipe.tags.set(tags)
+        self.create_ingredients(recipe, ingredients)
+        return recipe
+
+    def update(self, instance, validated_data):
+        instance.tags.clear()
+        IngredientRecipe.objects.filter(recipe=instance).delete()
+        instance.tags.set(validated_data.pop('tags'))
+        ingredients = validated_data.pop('ingredients')
+        self.create_ingredients(instance, ingredients)
+        return super().update(instance, validated_data)
 
 
 class ShoppingCartSerializer(serializers.ModelSerializer):
