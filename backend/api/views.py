@@ -12,7 +12,7 @@ from recipes.models import (Ingredient, Tag, Recipe, Favorites,
 from api.serializers import (IngredientSerializer, TagSerializer,
                              RecipeSerializer, RecipeReadSerializer)
 from api.errors import Error, SuccessMessage
-from api.filters import RecipeFilter
+from api.filters import RecipeFilters
 from api.pagination import Paginator
 
 
@@ -37,7 +37,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     ordering = ('-id',)
     pagination_class = Paginator
     filter_backends = (DjangoFilterBackend,)
-    filterset_class = RecipeFilter
+    filterset_class = RecipeFilters
 
     def get_serializer_class(self):
         if self.action in ('list', 'retrieve'):
