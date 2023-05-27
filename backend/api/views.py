@@ -28,12 +28,14 @@ class TagViewSet(viewsets.ModelViewSet):
     queryset = Tag.objects.all()
     permission_classes = (IsAuthenticatedOrReadOnly,)
     serializer_class = TagSerializer
+    pagination_class = None
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     permission_classes = (IsAuthenticatedOrReadOnly,)
     ordering = ('-id',)
+    pagination_class = None
 
     def get_serializer_class(self):
         if self.action in ('list', 'retrieve'):
