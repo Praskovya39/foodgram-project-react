@@ -8,6 +8,6 @@ class Error(Exception):
     NO_RECIPE = 'Такой рецепт ранее не был добавлен'
 
 
-class SuccessMessage: 
-    RECIPE_HAS_ADDED = 'Рецепт добавлен' 
-    RECIPE_DELETE = 'Рецепт удален' 
+class SuccessMessage:
+    RECIPE_HAS_ADDED = 'Рецепт добавлен'
+    RECIPE_DELETE = 'Рецепт удален'
