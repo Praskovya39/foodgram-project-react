@@ -4,17 +4,14 @@ from rest_framework.response import Response
 from rest_framework.permissions import (IsAuthenticatedOrReadOnly,
                                         IsAuthenticated)
 from rest_framework import filters
-from rest_framework.pagination import (LimitOffsetPagination,
-                                       PageNumberPagination)
+from rest_framework.pagination import (LimitOffsetPagination)
 from django.http import HttpResponse
-from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
 from django.db.models import Sum
 from recipes.models import (Ingredient, Tag, Recipe, Favorites,
                             ShoppingCart, IngredientsInRecipe)
 from api.serializers import (IngredientSerializer, TagSerializer,
                              RecipeSerializer, RecipeReadSerializer)
-from api.filters import RecipesFilters
 from api.errors import Error, SuccessMessage
 
 
