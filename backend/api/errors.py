@@ -7,3 +7,7 @@ class Error(Exception):
     RECIPE_DOUBLE = 'Рецепт уже был добавлен'
     NO_RECIPE = 'Такой рецепт ранее не был добавлен'
 
+
+class SuccessMessage: 
+    RECIPE_HAS_ADDED = 'Рецепт добавлен' 
+    RECIPE_DELETE = 'Рецепт удален' 
