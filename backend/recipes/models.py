@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
+from django.shortcuts import get_object_or_404
 from foodgram.settings import MIN_VALUE_MINUTES, MIN_VALUE_AMOUNT
 
 User = get_user_model()
