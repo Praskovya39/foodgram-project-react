@@ -3,6 +3,7 @@ import base64
 import webcolors
 from django.db import transaction
 from django.core.files.base import ContentFile
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from recipes.models import (Ingredient, Tag,
                             Recipe, Favorites,
