@@ -95,7 +95,7 @@ class RecipeReadSerializer(serializers.ModelSerializer):
         method_name='is_in_favorities')
     is_in_shopping_cart = serializers.SerializerMethodField(
         read_only=True,
-        method_name='is_in_cart')
+        method_name='is_in_shopping_cart')
 
     class Meta:
         model = Recipe
@@ -110,8 +110,10 @@ class RecipeReadSerializer(serializers.ModelSerializer):
 
     def get_is_in_shopping_cart(self, obj):
         request = self.context.get('request')
-        return ShoppingCart.objects.filter(
-            user=request.user, recipe__id=obj.id).exists()
+        return Recipe.objects.filter(
+            shopping_cart__user=request.user,
+            id=obj.id
+        ).exists()
 
 
 class RecipeSerializer(serializers.ModelSerializer):
@@ -130,19 +132,21 @@ class RecipeSerializer(serializers.ModelSerializer):
         fields = ('name', 'image', 'text',
                   'coking_time', 'ingredient', 'tags', 'author',)
 
-    @transaction.atomic
     def create(self, validated_data):
-        ingredients = validated_data.pop('ingredient')
+        ingredient = validated_data.pop('ingredient')
         tags = validated_data.pop('tags')
         recipe = Recipe.objects.create(**validated_data)
         for tag in tags:
             currets_tag, status = Tag.objects.get_or_create(**tag)
             TagRecipe.objects.create(tags=currets_tag, recipe=recipe)
-        for ingredient in ingredients:
-            currets_ingredient, status = (
-                Ingredient.objects.get_or_create(**ingredient))
+        for ingredient in ingredient:
+            id = ingredient.get('id')
+            amount = ingredient.get('amount')
+            ingredient_id = get_object_or_404(Ingredient, id=id)
             IngredientsInRecipe.objects.create(
-                ingredient=currets_ingredient, recipe=recipe)
+                recipe=recipe, ingredient=ingredient_id, amount=amount
+            )
+        recipe.save()
         return recipe
 
     @transaction.atomic
