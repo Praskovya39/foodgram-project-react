@@ -20,8 +20,14 @@ class IngredientViewSet(viewsets.ModelViewSet):
     queryset = Ingredient.objects.all()
     permission_classes = (IsAuthenticatedOrReadOnly,)
     pagination_class = None
-    search_fields = ('^name',)
     serializer_class = IngredientSerializer
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        name = self.request.GET.get('name')
+        if name:
+            queryset = queryset.filter(name__icontains=name)
+        return queryset
 
 
 class TagViewSet(viewsets.ModelViewSet):

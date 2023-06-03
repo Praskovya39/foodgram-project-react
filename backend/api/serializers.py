@@ -19,7 +19,6 @@ class IngredientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ingredient
         fields = ('name', 'measurement_unit')
-        lookup_field = 'name'
 
 
 class Hex2NameColor(serializers.Field):
@@ -40,7 +39,6 @@ class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
         fields = ('name', 'color', 'slug')
-        lookup_field = 'slug'
 
 
 class Base64ImageField(serializers.ImageField):
