@@ -55,12 +55,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action(methods=('get', 'post', 'delete'),
             detail=True,
             permission_classes=(IsAuthenticated),
-            url_path='shopping_cart')
-    def shopping_cart(self, request):
+            url_path='shoppingcart')
+    def shoppingcart(self, request):
         if request.method == 'POST':
             return self.create_obj(ShoppingCart, request.user, id)
         if request.method == 'GET':
-            return self.download_shopping_cart(ShoppingCart, request.user)
+            return self.download_shoppingcart(ShoppingCart, request.user)
         return self.delete_obj(ShoppingCart, request.user, id)
 
     def create_obj(self, model, user, id):
@@ -79,7 +79,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                             status=status.HTTP_200_OK)
         raise Error.NO_RECIPE
 
-    def download_shopping_cart(self, model):
+    def download_shoppingcart(self, model):
         check_list = IngredientsInRecipe.objects.filter(
             recipe__cart__user=self.request.user
         ).values(
