@@ -17,13 +17,12 @@ from api.pagination import Paginator
 
 
 class IngredientViewSet(viewsets.ModelViewSet):
-    queryset = Ingredient.objects.all()
     permission_classes = (IsAuthenticatedOrReadOnly,)
     pagination_class = None
     serializer_class = IngredientSerializer
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = Ingredient.objects.all()
         name = self.request.GET.get('name')
         if name:
             queryset = queryset.filter(name__icontains=name)
