@@ -22,11 +22,11 @@ class IngredientViewSet(viewsets.ModelViewSet):
     serializer_class = IngredientSerializer
 
     def get_queryset(self):
-        queryset = Ingredient.objects.all()
-        name = self.request.GET.get('name')
+        queryset = Ingredient.objects
+        name = self.request.query_params.get('name')
         if name:
-            queryset = queryset.filter(name__icontains=name)
-        return queryset
+            queryset = queryset.filter(name__istartswith=name)
+        return queryset.all()
 
 
 class TagViewSet(viewsets.ModelViewSet):
