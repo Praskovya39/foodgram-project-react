@@ -18,7 +18,7 @@ from api.errors import Error
 class IngredientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ingredient
-        fields = ('name', 'measurement_unit')
+        fields = '__all__'
 
 
 class Hex2NameColor(serializers.Field):
