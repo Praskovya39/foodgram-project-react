@@ -9,8 +9,7 @@ from recipes.models import (Ingredient, Tag,
                             IngredientsInRecipe,
                             ShoppingCart)
 from foodgram.settings import (MIN_VALUE_MINUTES,
-                               MIN_VALUE_AMOUNT,
-                               MIN_VALUE_INGREDIENTS)
+                               MIN_VALUE_AMOUNT)
 from api.errors import Error
 
 
@@ -161,7 +160,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             if ingredient['id'] in ingredients_list:
                 raise Error.NO_COPY
             ingredients_list.append(ingredient['id'])
-        return value
+        return ingredients
 
     def validate_cooking_time(self, cooking_time):
         if cooking_time < MIN_VALUE_MINUTES:
