@@ -142,7 +142,6 @@ class RecipeSerializer(serializers.ModelSerializer):
                 recipe=recipe, ingredient=ingredient_id, amount=amount
             )
         recipe.tags.set(tags)
-        recipe.save()
         return recipe
 
     def update(self, instance, validated_data):
