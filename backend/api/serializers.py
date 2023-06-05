@@ -153,7 +153,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
-   def validate_ingredients(self, ingredients):
+    def validate_ingredients(self, ingredients):
         ingredients_list = []
         if not ingredients:
             raise Error.NO_INGREDIENT
