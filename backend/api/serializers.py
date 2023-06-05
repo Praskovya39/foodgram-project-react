@@ -11,6 +11,7 @@ from recipes.models import (Ingredient, Tag,
 from foodgram.settings import (MIN_VALUE_MINUTES,
                                MIN_VALUE_AMOUNT)
 from api.errors import Error
+from users.serialisers import CustomUserListSerializer
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -83,6 +84,7 @@ class IngredientsInRecipeReadSerializer(serializers.ModelSerializer):
 class RecipeReadSerializer(serializers.ModelSerializer):
     ingredients = IngredientsInRecipeReadSerializer(many=True)
     tags = TagSerializer(many=True)
+    author = CustomUserListSerializer(read_only=True)
     is_favorited = serializers.SerializerMethodField(
         read_only=True,
         method_name='is_in_favorities')
@@ -116,9 +118,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         queryset=Tag.objects.all(),
         many=True
     )
-    author = serializers.StringRelatedField(
-        read_only=True,
-        default=serializers.CurrentUserDefault())
+    author = CustomUserListSerializer(read_only=True)
     image = Base64ImageField(required=False, allow_null=True)
 
     class Meta:
