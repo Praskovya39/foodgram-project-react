@@ -157,9 +157,9 @@ class RecipeSerializer(serializers.ModelSerializer):
         if not ingredients:
             raise Error.NO_INGREDIENT
         for ingredient in ingredients:
-            if ingredient['id'] in ingredients_list:
+            if ingredient in ingredients_list:
                 raise Error.NO_COPY
-            ingredients_list.append(ingredient['id'])
+            ingredients_list.append(ingredient)
         return ingredients
 
     def validate_cooking_time(self, cooking_time):
