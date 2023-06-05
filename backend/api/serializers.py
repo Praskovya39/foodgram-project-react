@@ -38,7 +38,7 @@ class TagSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tag
-        fields = ('name', 'color', 'slug')
+        fields = '__all__'
 
 
 class Base64ImageField(serializers.ImageField):
@@ -135,9 +135,6 @@ class RecipeSerializer(serializers.ModelSerializer):
         ingredient = validated_data.pop('ingredient')
         tags = validated_data.pop('tags')
         recipe = Recipe.objects.create(**validated_data)
-        for tag in tags:
-            currets_tag, status = Tag.objects.get_or_create(**tag)
-            TagRecipe.objects.create(tags=currets_tag, recipe=recipe)
         for ingredient in ingredient:
             id = ingredient.get('id')
             amount = ingredient.get('amount')
@@ -145,10 +142,10 @@ class RecipeSerializer(serializers.ModelSerializer):
             IngredientsInRecipe.objects.create(
                 recipe=recipe, ingredient=ingredient_id, amount=amount
             )
+        recipe.tags.set(tags)
         recipe.save()
         return recipe
 
-    @transaction.atomic
     def update(self, instance, validated_data):
         instance.name = validated_data.get('name', instance.name)
         instance.image = validated_data.get('image', instance.image)
