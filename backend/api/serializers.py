@@ -153,12 +153,14 @@ class RecipeSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
-    def validate_ingredients(self, value):
-        ingredients = value.get('ingredients')
-        if len(ingredients) < MIN_VALUE_INGREDIENTS:
+   def validate_ingredients(self, ingredients):
+        ingredients_list = []
+        if not ingredients:
             raise Error.NO_INGREDIENT
-        if len(ingredients) > len(ingredients.id):
-            raise Error.NO_COPY
+        for ingredient in ingredients:
+            if ingredient['id'] in ingredients_list:
+                raise Error.NO_COPY
+            ingredients_list.append(ingredient['id'])
         return value
 
     def validate_cooking_time(self, cooking_time):
