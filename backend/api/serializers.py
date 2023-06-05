@@ -1,14 +1,13 @@
 import base64
 
 import webcolors
-from django.db import transaction
 from django.core.files.base import ContentFile
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from recipes.models import (Ingredient, Tag,
                             Recipe, Favorites,
                             IngredientsInRecipe,
-                            ShoppingCart, TagRecipe)
+                            ShoppingCart)
 from foodgram.settings import (MIN_VALUE_MINUTES,
                                MIN_VALUE_AMOUNT,
                                MIN_VALUE_INGREDIENTS)
