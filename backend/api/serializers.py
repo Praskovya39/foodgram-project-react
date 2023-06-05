@@ -11,7 +11,7 @@ from recipes.models import (Ingredient, Tag,
 from foodgram.settings import (MIN_VALUE_MINUTES,
                                MIN_VALUE_AMOUNT)
 from api.errors import Error
-from users.serialisers import CustomUserListSerializer
+from users.serializers import CustomUserListSerializer
 
 
 class IngredientSerializer(serializers.ModelSerializer):
