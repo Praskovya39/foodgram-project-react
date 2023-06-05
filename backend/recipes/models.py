@@ -88,14 +88,6 @@ class Recipe(models.Model):
                 message=(f'Время менее {MIN_VALUE_MINUTES} мин')
             ),
         ),)
-    ingredient = models.ManyToManyField(
-        Ingredient,
-        through='IngredientsInRecipe',
-        blank=False,
-        related_name='recipes',
-        verbose_name='Ингридиенты',
-        help_text='выберите ингридиенты, необходимые для приготовления'
-    )
     tags = models.ManyToManyField(
         Tag,
         blank=False,
