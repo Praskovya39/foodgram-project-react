@@ -2,15 +2,17 @@ import os
 
 from dotenv import load_dotenv
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
 load_dotenv()
 
-DEBUG = True
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-ALLOWED_HOSTS = ['*']
+SECRET_KEY = os.getenv('TOKEN', 'default-value')
 
-SECRET_KEY = os.getenv('SECRET_KEY', default='12345')
+DEBUG = os.getenv('DEBUG', default=False)
+
+ALLOWED_HOSTS = [os.getenv('ALLOWED_HOSTS', default='*')]
+
+AUTH_USER_MODEL = 'users.User'
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -19,13 +21,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'users.apps.UsersConfig',
+    'recipes.apps.RecipesConfig',
+    'api.apps.ApiConfig',
     'rest_framework',
     'rest_framework.authtoken',
-    'djoser',
     'django_filters',
-    'recipes.apps.RecipesConfig',
-    'users.apps.UsersConfig',
-    'api.apps.ApiConfig'
+    'djoser',
+    'drf_yasg',
+    'colorfield',
 ]
 
 MIDDLEWARE = [
@@ -59,9 +63,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'foodgram.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/2.2/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': os.getenv('DB_ENGINE', 'django.db.backends.postgresql'),
@@ -73,9 +74,6 @@ DATABASES = {
     }
 }
 
-
-# Password validation
-# https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -93,39 +91,32 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.AllowAny",
     ],
-
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.TokenAuthentication",
     ],
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 6,
 }
-
 
 DJOSER = {
-    'SERIALIZERS': {
-        'user': 'users.serializers.CustomUserListSerializer',
-        'current_user': 'users.serializers.CustomUserListSerializer',
-        'user_create': 'users.serializers.CustomUserPostSerializer',
+    "SERIALIZERS": {
+        "user_create": "api.serializers.UserCreateSerializer",
+        "user": "api.serializers.UserSerializer",
+        "current_user": "api.serializers.UserSerializer",
     },
-    'PERMISSIONS': {
-        'user_list': ['rest_framework.permissions.IsAuthenticatedOrReadOnly'],
-        'user': ['djoser.permissions.CurrentUserOrAdminOrReadOnly'],
+
+    "PERMISSIONS": {
+        "user": ["djoser.permissions.CurrentUserOrAdminOrReadOnly"],
+        "user_list": ["rest_framework.permissions.IsAuthenticatedOrReadOnly"],
     },
-    'HIDE_USERS': False,
-    'LOGIN_FIELD': 'email',
+
+    "HIDE_USERS": False,
 }
 
+LANGUAGE_CODE = 'ru-RU'
 
-# Internationalization
-# https://docs.djangoproject.com/en/2.2/topics/i18n/
-
-LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Moscow'
 
 USE_I18N = True
 
@@ -133,27 +124,16 @@ USE_L10N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/2.2/howto/static-files/
-
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-AUTH_USER_MODEL = 'users.CustomUser'
+LENGTH_OF_FIELDS_USER_1 = 150
 
-EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
+LENGTH_OF_FIELDS_USER_2 = 254
 
-LIST_DIR = BASE_DIR, 'data'
-
-MIN_VALUE_MINUTES = 1
-
-MIN_VALUE_INGREDIENTS = 1
-
-MIN_VALUE_AMOUNT = 1
+LENGTH_OF_FIELDS_RECIPES = 200
 
 PAGE_SIZE = 6
