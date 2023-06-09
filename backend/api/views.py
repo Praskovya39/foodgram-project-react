@@ -11,14 +11,13 @@ from rest_framework.response import Response
 from recipes.models import (Favorite, Ingredient, IngredientRecipe, Recipe,
                             ShoppingCart, Tag)
 from users.models import Follow, User
-
 from api.filters import IngredientFilter, RecipeFilter
 from api.pagination import CustomPagination
 from api.permissions import AuthorPermission
 from api.serializers import (CreateRecipeSerializer, FavoriteSerializer,
-                          IngredientSerializer, RecipeReadSerializer,
-                          ShoppingCartSerializer, SubscribeListSerializer,
-                          TagSerializer, UserSerializer)
+                             IngredientSerializer, RecipeReadSerializer,
+                             ShoppingCartSerializer, SubscribeListSerializer,
+                             TagSerializer, UserSerializer)
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
@@ -144,12 +143,10 @@ class UserViewSet(UserViewSet):
             serializer.is_valid(raise_exception=True)
             Follow.objects.create(user=user, author=author)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-        if request.method == 'DELETE':
-            get_object_or_404(
-                Follow, user=user, author=author
-            ).delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+        get_object_or_404(
+            Follow, user=user, author=author
+        ).delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=False, permission_classes=[IsAuthenticated])
     def subscriptions(self, request):
