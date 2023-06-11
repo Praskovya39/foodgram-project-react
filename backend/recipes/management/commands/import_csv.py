@@ -1,34 +1,25 @@
 import json
-import os
 
-from django.conf import settings
-from django.core.management.base import BaseCommand, CommandError
-from django.db.utils import IntegrityError
-from recipes.models import Ingredient
+from django.core.management.base import BaseCommand
 
-DATA_ROOT = os.path.join(settings.BASE_DIR, 'data')
+from recipes.models import Ingredient, Tag
 
 
 class Command(BaseCommand):
-
-    def add_arguments(self, parser):
-        parser.add_argument('filename', default='ingredients.json', nargs='?',
-                            type=str)
+    help = ' Загрузить данные в модель ингредиентов '
 
     def handle(self, *args, **options):
-        try:
-            with open(os.path.join(DATA_ROOT, options['filename']), 'r',
-                      encoding='utf-8') as f:
-                data = json.load(f)
-                for ingredient in data:
-                    try:
-                        Ingredient.objects.create(name=ingredient['name'],
-                                                  measurement_unit=ingredient[
-                                                  'measurement_unit'])
-                    except IntegrityError:
-                        print(f'Ингредиент {ingredient["name"]} '
-                              f'{ingredient["measurement_unit"]} '
-                              f'Ингредиент уже добавлен')
+        self.stdout.write(self.style.WARNING('Старт команды'))
+        with open('data/ingredients.json', encoding='utf-8',
+                  ) as data_file_ingredients:
+            ingredient_data = json.loads(data_file_ingredients.read())
+            for ingredients in ingredient_data:
+                Ingredient.objects.get_or_create(**ingredients)
 
-        except FileNotFoundError:
-            raise CommandError('Файл отсутствует')
+        with open('data/tags.json', encoding='utf-8',
+                  ) as data_file_tags:
+            tags_data = json.loads(data_file_tags.read())
+            for tags in tags_data:
+                Tag.objects.get_or_create(**tags)
+
+        self.stdout.write(self.style.SUCCESS('Данные загружены'))
