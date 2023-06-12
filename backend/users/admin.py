@@ -4,9 +4,9 @@ from .models import User, Follow
 
 
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('username', 'email', 'first_name', 'last_name', 'is_admin')
-    search_fields = ('username', 'email')
-    list_filter = ('is_admin')
+    list_display = ('username', 'email', 'first_name', 'last_name', 'is_superuser')
+    search_fields = ('username', 'email', )
+    list_filter = ('is_superuser', )
     ordering = ('username', )
     empty_value_display = '-пусто-'
 
@@ -14,7 +14,7 @@ class UserAdmin(admin.ModelAdmin):
 class FollowAdmin(admin.ModelAdmin):
     list_display = ('user', 'author')
     search_fields = ('user__username', 'user__email',
-                     'author__username', 'author__email')
+                     'author__username', 'author__email', )
     empty_value_display = '-пусто-'
 
 
