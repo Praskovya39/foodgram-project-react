@@ -13,7 +13,7 @@ class IngredientInline(admin.TabularInline):
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
     list_display = ('author', 'name', 'cooking_time',
-                    'get_favorites', 'get_ingredients',)
+                    'get_favorites', 'get_ingredients')
     search_fields = ('author__username', 'author__email',)
     list_filter = ('tags', )
     inlines = (IngredientInline,)
@@ -46,14 +46,14 @@ class TagAdmin(admin.ModelAdmin):
 
 class FavoriteAdmin(admin.ModelAdmin):
     list_display = ('user', 'recipe')
-    list_filter = ('tags', )
+    list_filter = ('recipe__tags', )
     search_fields = ('user__username', 'user__email', )
     empty_value_display = '-пусто-'
 
 
 class ShoppingCartAdmin(admin.ModelAdmin):
     list_display = ('recipe', 'user')
-    list_filter = ('tags', )
+    list_filter = ('recipe__tags', )
     search_fields = ('user__username', 'user__email', )
     empty_value_display = '-пусто-'
 
